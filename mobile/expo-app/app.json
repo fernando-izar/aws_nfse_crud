@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "NFS-e App",
+    "slug": "nfse-app",
+    "scheme": "nfseapp",
+    "version": "1.0.0"
+  }
+}

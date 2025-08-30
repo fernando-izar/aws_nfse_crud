@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Arquitetura NFS-e (Python)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>body{margin:0;padding:24px;font-family:system-ui,Segoe UI,Roboto,Arial} pre.mermaid{background:#f7f7f7;border-radius:12px;padding:16px;}</style>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true, securityLevel: "loose" });
+  </script>
+</head>
+<body>
+  <h1>Arquitetura NFS-e (Python)</h1>
+  <pre class="mermaid">
+flowchart LR
+  subgraph Clients["Clientes"]
+    WEB["Admin Web (S3+CloudFront)"]
+    MOB["App Mobile (iOS/Android)"]
+  end
+
+  subgraph AuthAPI["Auth & API"]
+    COG["Cognito (User Pool)"]
+    API["API Gateway (REST)"]
+  end
+
+  subgraph Compute["Compute"]
+    L_EMIT["Lambda (Python): emit"]
+    L_GET["Lambda (Python): consult"]
+    L_CANCEL["Lambda (Python): cancel"]
+    L_PING["Lambda (Python): ping"]
+  end
+
+  subgraph Data["Data"]
+    DDBI["DynamoDB: Invoices"]
+    DDBR["DynamoDB: Requests"]
+    S3DOC["S3: docs (XML/PDF)"]
+  end
+
+  WEB--"JWT via Hosted UI"-->COG
+  MOB--"JWT via Hosted UI"-->COG
+  WEB--"HTTPS"-->API
+  MOB--"HTTPS"-->API
+
+  API-->L_PING
+  API-->L_EMIT
+  API-->L_GET
+  API-->L_CANCEL
+
+  L_EMIT-->DDBI
+  L_GET-->DDBI
+  L_CANCEL-->DDBI
+  L_EMIT-->S3DOC
+
+  </pre>
+</body>
+</html>
